@@ -12,6 +12,10 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -20,13 +24,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.vknewsclient.R
+import com.example.vknewsclient.domain.StatisticType
+import com.example.vknewsclient.domain.StatisticsItem
 
 @Composable
 fun NewsBottomPanel(
-    viewCount:Int,
-    likeCount:Int,
-    shareCount:Int,
-    commentCount:Int
+    statisticsList:List<StatisticsItem>,
+    onItemClickListener:(StatisticsItem)->Unit
 ){
     Row(
         modifier = Modifier.fillMaxSize()
@@ -34,21 +38,41 @@ fun NewsBottomPanel(
         Row(
             modifier = Modifier.weight(1f)
         ){
-            ImageAndText(icon = painterResource(id = R.drawable.ic_views_count), text = viewCount.toString(),{})
+            val viewItem = getItemByType(statisticsList, StatisticType.VIEWS)
+            ImageAndText(icon = painterResource(id = R.drawable.ic_views_count),viewItem.count) {
+                onItemClickListener(viewItem)
+            }
         }
         Row(
             modifier = Modifier.weight(1f),
             horizontalArrangement = Arrangement.SpaceBetween
         ){
-            ImageAndText(icon = painterResource(id = R.drawable.ic_share_count), text = shareCount.toString(),{})
-            ImageAndText(icon = painterResource(id = R.drawable.ic_comment), text = commentCount.toString(),{})
-            ImageAndText(icon = rememberVectorPainter(image = Icons.Default.Favorite), text = likeCount.toString(),{})
+            val shareItem = getItemByType(statisticsList, StatisticType.SHARE)
+            ImageAndText(icon = painterResource(id = R.drawable.ic_share_count), shareItem.count) {
+                onItemClickListener(shareItem)
+            }
+            val commentItem = getItemByType(statisticsList, StatisticType.COMMENTS)
+            ImageAndText(icon = painterResource(id = R.drawable.ic_comment), commentItem.count) {
+                onItemClickListener(commentItem)
+            }
+            val likeItem = getItemByType(statisticsList, StatisticType.LIKES)
+            ImageAndText(icon = rememberVectorPainter(image = Icons.Default.Favorite), likeItem.count){
+                onItemClickListener(likeItem)
+            }
         }
     }
 }
 
+private fun getItemByType(statisticsList:List<StatisticsItem>, type:StatisticType):StatisticsItem{
+    for (statisticsItem in statisticsList) {
+        if(statisticsItem.type == type)
+            return statisticsItem
+    }
+    throw NullPointerException("There is no element of statistics like this")
+}
+
 @Composable
-fun ImageAndText(icon:Painter,text:String, onIconClick:()->Unit){
+fun ImageAndText(icon:Painter,count:Int, onIconClick:()->Unit){
     Row(
         modifier = Modifier.clickable {
             onIconClick()
@@ -60,12 +84,6 @@ fun ImageAndText(icon:Painter,text:String, onIconClick:()->Unit){
             tint = MaterialTheme.colors.onSecondary
         )
         Spacer(modifier = Modifier.width(5.dp))
-        Text(text)
+        Text(count.toString())
     }
-}
-
-@Preview
-@Composable
-fun BottomPanelPrev(){
-    NewsBottomPanel(viewCount = 681, likeCount = 25, shareCount = 9, commentCount = 11)
 }

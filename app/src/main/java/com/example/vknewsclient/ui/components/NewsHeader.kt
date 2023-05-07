@@ -67,18 +67,3 @@ fun NewsHeader(
         )
     }
 }
-
-@Preview
-@Composable
-fun HeaderPrev(){
-    VkNewsClientTheme(darkTheme = false) {
-        NewsHeader(headerImageRes = 0, headerText = "Qumash", timeText = "20:58")
-    }
-}
-@Preview
-@Composable
-fun HeaderPrevDark(){
-    VkNewsClientTheme(darkTheme = true) {
-        NewsHeader(headerImageRes = 0, headerText = "Qumash", timeText = "20:58")
-    }
-}
